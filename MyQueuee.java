@@ -18,7 +18,7 @@ class MyQueuee {
     }
 
     public static void main(String[] args) {
-        MyQueue q = new MyQueue();
+        MyQueuee q = new MyQueuee();
         q.enqueue(10);
         q.enqueue(20);
         System.out.println(q.dequeue()); // 10
