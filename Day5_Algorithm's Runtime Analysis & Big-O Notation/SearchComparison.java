@@ -6,7 +6,6 @@ public class SearchComparison {
         int[] data = new int[size];
         for (int i = 0; i < size; i++) data[i] = i;
         int target = size - 1;
-
         long start = System.nanoTime();
         for (int i = 0; i < size; i++) {
             if (data[i] == target) break;
