@@ -1,27 +1,26 @@
+
 import java.util.*;
 
 public class ShoppingCart {
     public static void main(String[] args) {
         HashMap<String, Double> productPrices = new HashMap<>();
-        productPrices.put("Apple", 2.0);
-        productPrices.put("Banana", 1.0);
-        productPrices.put("Mango", 3.0);
-
         LinkedHashMap<String, Integer> cart = new LinkedHashMap<>();
-        cart.put("Banana", 2);
-        cart.put("Apple", 1);
-        cart.put("Mango", 3);
+        TreeMap<Double, String> sortedByPrice = new TreeMap<>();
 
-        System.out.println("Cart (order of addition): " + cart);
+        productPrices.put("Milk", 40.0);
+        productPrices.put("Bread", 30.0);
+        productPrices.put("Eggs", 60.0);
 
-        TreeMap<Double, String> priceSortMap = new TreeMap<>();
-        for (String product : cart.keySet()) {
-            priceSortMap.put(productPrices.get(product), product);
+        cart.put("Milk", 1);
+        cart.put("Bread", 2);
+        cart.put("Eggs", 1);
+
+        for (Map.Entry<String, Double> entry : productPrices.entrySet()) {
+            sortedByPrice.put(entry.getValue(), entry.getKey());
         }
 
-        System.out.println("Items sorted by price:");
-        for (Map.Entry<Double, String> entry : priceSortMap.entrySet()) {
-            System.out.println(entry.getValue() + " - $" + entry.getKey());
-        }
+        System.out.println("Cart Items (LinkedHashMap): " + cart);
+        System.out.println("Product Prices (HashMap): " + productPrices);
+        System.out.println("Sorted by Price (TreeMap): " + sortedByPrice);
     }
 }
