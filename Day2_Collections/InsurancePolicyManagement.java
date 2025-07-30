@@ -1,53 +1,87 @@
+
 import java.util.*;
-import java.time.*;
 
 class Policy {
     String policyNumber;
-    String policyHolder;
-    LocalDate expiryDate;
+    String holderName;
+    Date expiryDate;
 
-    Policy(String policyNumber, String policyHolder, LocalDate expiryDate) {
+    public Policy(String policyNumber, String holderName, Date expiryDate) {
         this.policyNumber = policyNumber;
-        this.policyHolder = policyHolder;
+        this.holderName = holderName;
         this.expiryDate = expiryDate;
     }
 
     public String toString() {
-        return "Policy[" + policyNumber + ", " + policyHolder + ", " + expiryDate + "]";
+        return policyNumber + " - " + holderName + " - " + expiryDate;
     }
 }
 
 public class InsurancePolicyManagement {
-    public static void main(String[] args) {
-        HashMap<String, Policy> policyMap = new HashMap<>();
-        LinkedHashMap<String, Policy> insertionOrderMap = new LinkedHashMap<>();
-        TreeMap<LocalDate, List<Policy>> expiryMap = new TreeMap<>();
+    static HashMap<String, Policy> policyMap = new HashMap<>();
+    static LinkedHashMap<String, Policy> orderedPolicies = new LinkedHashMap<>();
+    static TreeMap<Date, List<Policy>> sortedPolicies = new TreeMap<>();
 
-        Policy p1 = new Policy("P001", "John", LocalDate.now().plusDays(10));
-        Policy p2 = new Policy("P002", "Alice", LocalDate.now().plusDays(40));
-        Policy p3 = new Policy("P003", "John", LocalDate.now().plusDays(5));
-        Policy p4 = new Policy("P004", "Bob", LocalDate.now().minusDays(2));
+    public static void addPolicy(Policy p) {
+        policyMap.put(p.policyNumber, p);
+        orderedPolicies.put(p.policyNumber, p);
+        sortedPolicies.computeIfAbsent(p.expiryDate, k -> new ArrayList<>()).add(p);
+    }
 
-        for (Policy p : Arrays.asList(p1, p2, p3, p4)) {
-            policyMap.put(p.policyNumber, p);
-            insertionOrderMap.put(p.policyNumber, p);
-            expiryMap.computeIfAbsent(p.expiryDate, k -> new ArrayList<>()).add(p);
+    public static Policy getPolicyByNumber(String number) {
+        return policyMap.get(number);
+    }
+
+    public static List<Policy> getPoliciesExpiringSoon() {
+        List<Policy> result = new ArrayList<>();
+        Calendar cal = Calendar.getInstance();
+        Date now = cal.getTime();
+        cal.add(Calendar.DAY_OF_MONTH, 30);
+        Date future = cal.getTime();
+        for (Date d : sortedPolicies.subMap(now, true, future, true).keySet()) {
+            result.addAll(sortedPolicies.get(d));
         }
+        return result;
+    }
 
-        System.out.println("Retrieve by policy number (P002): " + policyMap.get("P002"));
-
-        System.out.println("\nPolicies expiring within 30 days:");
-        LocalDate today = LocalDate.now();
-        LocalDate threshold = today.plusDays(30);
-        expiryMap.subMap(today, true, threshold, true).values().forEach(System.out::println);
-
-        System.out.println("\nPolicies for John:");
+    public static List<Policy> getPoliciesByHolder(String name) {
+        List<Policy> result = new ArrayList<>();
         for (Policy p : policyMap.values()) {
-            if (p.policyHolder.equals("John")) System.out.println(p);
+            if (p.holderName.equalsIgnoreCase(name)) {
+                result.add(p);
+            }
         }
+        return result;
+    }
 
-        System.out.println("\nRemoving expired policies...");
-        policyMap.values().removeIf(p -> p.expiryDate.isBefore(today));
-        policyMap.values().forEach(System.out::println);
+    public static void removeExpired() {
+        Date now = new Date();
+        List<String> toRemove = new ArrayList<>();
+        for (Policy p : policyMap.values()) {
+            if (p.expiryDate.before(now)) {
+                toRemove.add(p.policyNumber);
+            }
+        }
+        for (String key : toRemove) {
+            Policy p = policyMap.remove(key);
+            orderedPolicies.remove(key);
+            sortedPolicies.get(p.expiryDate).remove(p);
+        }
+    }
+
+    public static void main(String[] args) {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DAY_OF_MONTH, 10);
+        addPolicy(new Policy("P101", "Alice", cal.getTime()));
+        cal.add(Calendar.DAY_OF_MONTH, 25);
+        addPolicy(new Policy("P102", "Bob", cal.getTime()));
+        cal.add(Calendar.DAY_OF_MONTH, -50);
+        addPolicy(new Policy("P103", "Alice", cal.getTime()));
+
+        System.out.println("All Policies: " + policyMap.values());
+        System.out.println("Expiring in 30 days: " + getPoliciesExpiringSoon());
+        System.out.println("Policies by Alice: " + getPoliciesByHolder("Alice"));
+        removeExpired();
+        System.out.println("After Removing Expired: " + policyMap.values());
     }
 }
