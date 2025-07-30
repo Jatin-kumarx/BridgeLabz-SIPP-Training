@@ -1,24 +1,22 @@
+
 import java.util.*;
 
 public class VotingSystem {
     public static void main(String[] args) {
         HashMap<String, Integer> voteMap = new HashMap<>();
-        LinkedHashMap<String, Integer> orderMap = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> voteOrder = new LinkedHashMap<>();
+        voteMap.put("Alice", 3);
+        voteMap.put("Bob", 5);
+        voteMap.put("Charlie", 2);
 
-        String[] votes = {"Alice", "Bob", "Alice", "Charlie", "Bob", "Alice"};
+        voteOrder.put("Alice", 3);
+        voteOrder.put("Bob", 5);
+        voteOrder.put("Charlie", 2);
 
-        for (String vote : votes) {
-            voteMap.put(vote, voteMap.getOrDefault(vote, 0) + 1);
-            orderMap.put(vote, voteMap.get(vote));
-        }
+        TreeMap<String, Integer> sortedVotes = new TreeMap<>(voteMap);
 
-        System.out.println("Vote counts (unordered): " + voteMap);
-        System.out.println("Vote counts (in order): " + orderMap);
-
-        TreeMap<String, Integer> sortedResults = new TreeMap<>(voteMap);
-        System.out.println("Sorted results:");
-        for (Map.Entry<String, Integer> entry : sortedResults.entrySet()) {
-            System.out.println(entry.getKey() + ": " + entry.getValue());
-        }
+        System.out.println("Vote Count (HashMap): " + voteMap);
+        System.out.println("Vote Order (LinkedHashMap): " + voteOrder);
+        System.out.println("Sorted Votes (TreeMap): " + sortedVotes);
     }
 }
